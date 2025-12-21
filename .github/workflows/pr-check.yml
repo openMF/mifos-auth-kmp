@@ -10,10 +10,10 @@ on:
         default: '17'
   push:
     branches:
-      -main
+      - main
   pull_request:
     branches:
-      -main
+      - main
 
 
 concurrency:
