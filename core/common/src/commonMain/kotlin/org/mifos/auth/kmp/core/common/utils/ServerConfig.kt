@@ -21,7 +21,7 @@ data class ServerConfig(
             endPoint = "tt.mifos.community",
             apiPath = "/fineract-provider/api/v1/",
             port = "443",
-            tenant = "dev",
+            tenant = "default",
         )
 
         val LOCALHOST = ServerConfig(

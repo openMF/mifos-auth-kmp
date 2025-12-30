@@ -36,16 +36,11 @@ class HomeScreenViewModel(
 
     private fun handleLogout() {
         viewModelScope.launch {
-            try {
-                userPreferenceDatastore.deleteUser()
-                mutableStateFlow.update {
-                    it.copy(user = null)
-                }
-                sendEvent(HomeScreenEvent.OnLogout)
-                // TODO: Handle logout navigation
-            } catch (e: Exception) {
-                // Handle error if needed
+            userPreferenceDatastore.deleteUser()
+            mutableStateFlow.update {
+                it.copy(user = null)
             }
+            sendEvent(HomeScreenEvent.OnLogout)
         }
     }
 }
