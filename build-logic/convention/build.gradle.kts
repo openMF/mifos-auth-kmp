@@ -13,11 +13,13 @@ java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
 }
-tasks.withType<KotlinCompile>().configureEach {
+
+kotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
+        jvmTarget = JvmTarget.JVM_17
     }
 }
+
 
 dependencies {
     compileOnly(libs.android.gradlePlugin)
@@ -32,10 +34,9 @@ dependencies {
 tasks {
     validatePlugins {
         enableStricterValidation = true
-        failOnWarning = false
+        failOnWarning = true
     }
 }
-
 gradlePlugin {
     plugins {
         register("androidApplicationCompose") {
@@ -64,6 +65,11 @@ gradlePlugin {
             id = "mifos.ktlint.plugin"
             implementationClass = "MifosKtlintConventionPlugin"
             description = "Configures kotlinter for the project"
+        }
+        register("gitHooks") {
+            id = "mifos.git.hooks"
+            implementationClass = "GitHooksConventionPlugin"
+            description = "Installs git hooks for the project"
         }
         register("kmpLibrary") {
             id = "mifos.kmp.library"

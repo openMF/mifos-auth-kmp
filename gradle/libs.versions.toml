@@ -39,6 +39,7 @@ material3Icons = "1.7.3"
 material3 = "1.9.0"
 uiToolingPreview = "1.10.0"
 
+truth = "1.4.5"
 dependencyGuard = "0.5.0"
 spotlessVersion = "8.1.0"
 detekt = "1.23.8"
@@ -53,6 +54,8 @@ kermit-logger = "2.0.8"
 composeJB = "1.10.0"
 jbCoreBundle = "1.0.1"
 jbSavedState = "1.4.0"
+googleOssPlugin = "0.10.10"
+
 
 [libraries]
 
@@ -150,9 +153,13 @@ material3-icons = { module = "org.jetbrains.compose.material:material-icons-exte
 #kermit logger
 kermit-logger ={module="co.touchlab:kermit",version.ref = "kermit-logger"}
 
+google-oss-licenses-plugin = { group = "com.google.android.gms", name = "oss-licenses-plugin", version.ref = "googleOssPlugin" }
+truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
+androidTest = { id = "com.android.test", version.ref = "agp" }
 composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
@@ -166,11 +173,11 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 android-lint = { id = "com.android.lint", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
+mifos-git-hook = { id="mifos.git.hooks", version = "unspecified" }
 mifos-android-application = { id = "mifos.android.application", version = "unspecified" }
 mifos-android-application-compose = { id = "mifos.android.application.compose", version = "unspecified" }
 mifos-kmp-library = { id = "mifos.kmp.library", version = "unspecified" }
 mifos-cmp-feature = { id = "mifos.cmp.feature", version = "unspecified" }
-
 
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotlessVersion" }

@@ -9,9 +9,6 @@
 plugins {
     alias(libs.plugins.mifos.android.application)
     alias(libs.plugins.mifos.android.application.compose)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.composeMultiplatform)
 }
 
 android {
