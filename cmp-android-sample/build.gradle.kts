@@ -35,6 +35,11 @@ android {
     }
 }
 
+dependencyGuard {
+    configuration("debugRuntimeClasspath")
+    configuration("releaseRuntimeClasspath")
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
