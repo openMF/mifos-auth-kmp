@@ -1,3 +1,12 @@
+/*
+ * Copyright 2026 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See https://github.com/openMF/mifos-auth-kmp/blob/main/LICENSE
+ */
 package org.mifos.auth.kmp.sample.ui
 
 import androidx.lifecycle.ViewModel
@@ -14,14 +23,13 @@ import kotlinx.coroutines.launch
 
 abstract class BaseViewModel<S, E, A>(
     initialState: S,
-): ViewModel() {
+) : ViewModel() {
 
     protected val mutableStateFlow: MutableStateFlow<S> = MutableStateFlow(initialState)
 
     private val eventChannel: Channel<E> = Channel(capacity = Channel.Factory.UNLIMITED)
 
     private val internalActionChannel = Channel<A>(capacity = Channel.Factory.UNLIMITED)
-
 
     protected val state: MutableStateFlow<S>
         get() = mutableStateFlow
@@ -51,6 +59,4 @@ abstract class BaseViewModel<S, E, A>(
     protected fun sendEvent(event: E) {
         viewModelScope.launch { eventChannel.send(event) }
     }
-
-
 }

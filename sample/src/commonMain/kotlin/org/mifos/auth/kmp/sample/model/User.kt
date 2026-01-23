@@ -1,7 +1,15 @@
+/*
+ * Copyright 2026 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See https://github.com/openMF/mifos-auth-kmp/blob/main/LICENSE
+ */
 package org.mifos.auth.kmp.sample.model
 
 import kotlinx.serialization.Serializable
-
 
 @Serializable
 data class User(
@@ -14,4 +22,3 @@ data class User(
     val roles: List<Role> = emptyList(),
     val permissions: List<String> = emptyList(),
 )
-

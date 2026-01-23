@@ -1,39 +1,44 @@
+/*
+ * Copyright 2026 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See https://github.com/openMF/mifos-auth-kmp/blob/main/LICENSE
+ */
 plugins {
-    alias(libs.plugins.androidApplication)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.mifos.android.application)
+    alias(libs.plugins.mifos.android.application.compose)
 }
 
 android {
-    namespace = "org.mifos.auth.kmp.cmp_android_sample"
-    compileSdk = 36
+    namespace = "cmp.android.sample"
 
     defaultConfig {
-        applicationId = "org.mifos.auth.kmp.cmp_android_sample"
-        minSdk = 24
-        targetSdk = 36
+        applicationId = "org.mifos.auth.kmp.android.sample"
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    lint {
+        xmlReport = true
+        checkDependencies = true
+        abortOnError = false
+        // Disable this rule until we ship the libraries to some maven.
+        disable += "ResourceName"
+        disable += "MissingTranslation"
+        disable += "ExtraTranslation"
+        baseline = File("lint-baseline.xml")
+        explainIssues = true
+        htmlReport = true
+    }
+}
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-    buildFeatures {
-        compose = true
-    }
+dependencyGuard {
+    configuration("debugRuntimeClasspath")
+    configuration("releaseRuntimeClasspath")
 }
 
 dependencies {

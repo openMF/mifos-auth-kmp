@@ -1,0 +1,259 @@
+/*
+ * Copyright 2026 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See https://github.com/openMF/mifos-auth-kmp/blob/main/LICENSE
+ */
+package org.mifos.autm.kmp.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
+
+@Composable
+fun BasicAuthScreen(
+    state: AuthUiState,
+    onAction: (AuthAction) -> Unit,
+    config: BasicAuthUiConfig = BasicAuthUiConfig(),
+    style: AuthUiStyle = AuthUiStyle(),
+    headerContent: @Composable BoxScope.() -> Unit = {
+        Text("Welcome", style = MaterialTheme.typography.headlineMedium)
+    },
+    errorContent: @Composable ColumnScope.(String) -> Unit = { errorMsg ->
+        Text(
+            text = errorMsg,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodySmall,
+        )
+    },
+    footerContent: (@Composable ColumnScope.() -> Unit)? = null,
+) {
+    Column(
+        modifier = style.containerModifier
+            .fillMaxSize()
+            .background(style.backgroundColor)
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            headerContent()
+        }
+
+        if (state.errorMessage != null) {
+            Spacer(modifier = Modifier.height(16.dp))
+            errorContent(state.errorMessage)
+        }
+
+        OutlinedTextField(
+            value = state.username,
+            onValueChange = { onAction(AuthAction.UpdateUsername(it)) },
+            placeholder = {
+                Text(
+                    text = config.usernameLabel,
+                    style = style.textFieldTextStyle,
+                    color = style.textFieldPlaceholderColor,
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Username icon",
+                    tint = style.textFieldIconColor,
+                )
+            },
+            singleLine = true,
+            shape = style.fieldShape,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = style.textFieldFocusedBackgroundColor,
+                unfocusedContainerColor = style.textFieldBackgroundColor,
+                disabledContainerColor = style.textFieldBackgroundColor,
+                focusedBorderColor = style.textFieldFocusedBorderColor,
+                unfocusedBorderColor = style.textFieldBorderColor,
+                disabledBorderColor = style.textFieldBorderColor,
+                focusedTextColor = style.textFieldTextColor,
+                unfocusedTextColor = style.textFieldTextColor,
+                focusedLeadingIconColor = style.textFieldIconColor,
+                unfocusedLeadingIconColor = style.textFieldIconColor,
+                focusedPlaceholderColor = style.textFieldPlaceholderColor,
+                unfocusedPlaceholderColor = style.textFieldPlaceholderColor,
+            ),
+            textStyle = style.textFieldTextStyle,
+            modifier = style.fieldModifier.fillMaxWidth(),
+            enabled = !state.isLoading,
+        )
+
+        Spacer(modifier = Modifier.height(style.spacingBetweenFields))
+
+        OutlinedTextField(
+            value = state.password,
+            onValueChange = { onAction(AuthAction.UpdatePassword(it)) },
+            placeholder = {
+                Text(
+                    text = config.passwordLabel,
+                    style = style.textFieldTextStyle,
+                    color = style.textFieldPlaceholderColor,
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = "Password icon",
+                    tint = style.textFieldIconColor,
+                )
+            },
+            singleLine = true,
+            shape = style.fieldShape,
+            visualTransformation = if (state.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = if (config.showPasswordToggle) {
+                {
+                    IconButton(onClick = { onAction(AuthAction.TogglePasswordVisibility) }) {
+                        Icon(
+                            if (state.isPasswordVisible) {
+                                Icons.Default.Visibility
+                            } else {
+                                Icons.Default.VisibilityOff
+                            },
+                            contentDescription = if (state.isPasswordVisible) "Hide" else "Show",
+                            tint = style.textFieldIconColor,
+                        )
+                    }
+                }
+            } else {
+                null
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = style.textFieldFocusedBackgroundColor,
+                unfocusedContainerColor = style.textFieldBackgroundColor,
+                disabledContainerColor = style.textFieldBackgroundColor,
+                focusedBorderColor = style.textFieldFocusedBorderColor,
+                unfocusedBorderColor = style.textFieldBorderColor,
+                disabledBorderColor = style.textFieldBorderColor,
+                focusedTextColor = style.textFieldTextColor,
+                unfocusedTextColor = style.textFieldTextColor,
+                focusedLeadingIconColor = style.textFieldIconColor,
+                unfocusedLeadingIconColor = style.textFieldIconColor,
+                focusedTrailingIconColor = style.textFieldIconColor,
+                unfocusedTrailingIconColor = style.textFieldIconColor,
+                focusedPlaceholderColor = style.textFieldPlaceholderColor,
+                unfocusedPlaceholderColor = style.textFieldPlaceholderColor,
+            ),
+            textStyle = style.textFieldTextStyle,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            modifier = style.fieldModifier.fillMaxWidth(),
+            enabled = !state.isLoading,
+        )
+
+        if (config.forgotPasswordLabel != null) {
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                TextButton(
+                    onClick = { onAction(AuthAction.ForgotPasswordClicked) },
+                    enabled = !state.isLoading,
+                ) {
+                    Text(
+                        config.forgotPasswordLabel,
+                        style = style.buttonTextStyle,
+                        color = style.buttonBackgroundColor,
+                    )
+                }
+            }
+        }
+
+        if (config.forgotPasswordLabel == null) {
+            Spacer(modifier = Modifier.height(style.spacingBeforeButton))
+        }
+
+        Button(
+            onClick = { onAction(AuthAction.LoginClicked) },
+            enabled = state.isBasicAuthLoginButtonEnabled && !state.isLoading,
+            shape = style.buttonShape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = style.buttonBackgroundColor,
+                disabledContainerColor = style.buttonDisabledBackgroundColor,
+            ),
+            modifier = style.fieldModifier
+                .fillMaxWidth()
+                .height(style.buttonHeight),
+        ) {
+            if (state.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = style.buttonLoadingIndicatorColor,
+                    strokeWidth = 2.dp,
+                )
+            } else {
+                Text(
+                    text = config.loginButtonLabel,
+                    style = style.buttonTextStyle,
+                    color = style.buttonTextColor,
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(style.spacingBeforeButton))
+
+        if (config.showSignUpLabel) {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Don't have an account? ", style = style.buttonTextStyle)
+                Text(
+                    "Sign Up!",
+                    style = style.buttonTextStyle,
+                    color = style.buttonBackgroundColor,
+                    modifier = Modifier.clickable(enabled = !state.isLoading) {
+                        onAction(AuthAction.ForgotPasswordClicked)
+                    },
+                )
+            }
+        }
+
+        if (footerContent != null) {
+            Spacer(modifier = Modifier.weight(1f))
+            footerContent()
+        }
+    }
+}

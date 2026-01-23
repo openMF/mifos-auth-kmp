@@ -1,11 +1,18 @@
+/*
+ * Copyright 2026 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See https://github.com/openMF/mifos-auth-kmp/blob/main/LICENSE
+ */
 import com.android.build.api.dsl.androidLibrary
 import org.gradle.api.problems.internal.GradleCoreProblemGroup.compilation
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.android.kotlin.multiplatform.library)
-    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.mifos.kmp.library)
 }
 
 
@@ -13,29 +20,6 @@ kotlin {
     android {
         namespace ="org.mifos.auth.kmp.core.domain"
     }
-
-    jvm()
-    androidLibrary {
-        namespace = "org.mifos.auth.kmp"
-        compileSdk = libs.versions.android.compileSdk.get().toInt()
-        minSdk = libs.versions.android.minSdk.get().toInt()
-
-        withJava() // enable java compilation support
-//        withHostTestBuilder {}.configure {}
-//        withDeviceTestBuilder {
-//            sourceSetTreeName = "test"
-//        }
-
-        compilations.configureEach {
-            compilerOptions.configure {
-                jvmTarget.set(
-                    JvmTarget.JVM_17
-                )
-            }
-        }
-    }
-    iosX64()
-    iosArm64()
 
     sourceSets {
         commonMain.dependencies {

@@ -1,16 +1,34 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
-        google()
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
         mavenCentral()
         gradlePluginPortal()
-        maven("https://maven.pkg.jetbrains.space/public/p/koin/dev")
     }
 }
 
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
 dependencyResolutionManagement {
+    repositoriesMode = RepositoriesMode.PREFER_PROJECT
     repositories {
-        google()
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
         mavenCentral()
+        gradlePluginPortal()
         maven("https://maven.pkg.jetbrains.space/public/p/koin/dev")
     }
 }
@@ -28,3 +46,4 @@ include(":core:common")
 include(":sample")
 include(":cmp-android-sample")
 include(":cmp-shared-sample")
+include(":mifos-auth-kmp-ui")

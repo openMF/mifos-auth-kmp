@@ -1,25 +1,26 @@
+/*
+ * Copyright 2026 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See https://github.com/openMF/mifos-auth-kmp/blob/main/LICENSE
+ */
 package org.mifos.auth.kmp.sample.ui.login
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Key
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -27,13 +28,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
-
+import org.mifos.auth.kmp.sample.Res
+import org.mifos.auth.kmp.sample.mifos_logo
+import org.mifos.autm.kmp.ui.AuthAction
+import org.mifos.autm.kmp.ui.AuthScreen
+import org.mifos.autm.kmp.ui.AuthUiStyle
 
 @Composable
 fun LoginScreen(
@@ -50,121 +55,94 @@ fun LoginScreen(
         }
     }
 
-    if (state.screenState != null) {
+    if (state.screenState != null && !state.showBasicAuthForm) {
         LoginScreenDialog(
             state = state,
             onDismiss = {
                 loginViewModel.trySendAction(LoginScreenAction.DismissError)
-            }
+            },
         )
     }
 
     LoginScreenContent(
         state = state,
-        onAction = loginViewModel::trySendAction
+        onAction = loginViewModel::trySendAction,
     )
-
 }
 
 @Composable
 fun LoginScreenContent(
     state: LoginScreenState = LoginScreenState(),
-    onAction: (LoginScreenAction) -> Unit = {}
+    onAction: (LoginScreenAction) -> Unit = {},
 ) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            // Back button in top left corner (only visible in basic auth form)
-            if (state.showBasicAuthForm) {
-                IconButton(
-                    onClick = { onAction(LoginScreenAction.BackButtonClicked) },
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
-                    )
-                }
+    AuthScreen(
+        state = state.toBasicAuthUiState().copy(showBasicAuthForm = state.showBasicAuthForm),
+        onAction = { authAction ->
+            when (authAction) {
+                AuthAction.BasicAuthButtonClicked -> onAction(LoginScreenAction.BasicAuthButtonClicked)
+                AuthAction.BackButtonClicked -> onAction(LoginScreenAction.BackButtonClicked)
+                is AuthAction.UpdatePassword -> onAction(LoginScreenAction.PasswordChanged(authAction.value))
+                is AuthAction.UpdateUsername -> onAction(LoginScreenAction.UsernameChanged(authAction.value))
+                is AuthAction.LoginClicked -> onAction(
+                    LoginScreenAction.LoginButtonClicked(
+                        username = state.username,
+                        password = state.password,
+                    ),
+                )
+                AuthAction.TogglePasswordVisibility -> onAction(LoginScreenAction.TogglePasswordVisibility)
             }
-
+        },
+        selectOptionScreenHeader = {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center),
             ) {
+                Image(
+                    painter = painterResource(Res.drawable.mifos_logo),
+                    contentDescription = "Mifos Logo",
+                    modifier = Modifier.size(200.dp, 100.dp),
+                )
+                Spacer(Modifier.height(8.dp))
                 Text(
-                    text = "Login",
-                    style = MaterialTheme.typography.headlineLarge,
-                    modifier = Modifier.padding(bottom = 32.dp)
+                    text = "Select sign in method",
+                    style = MaterialTheme.typography.titleSmall,
                 )
 
-                if (!state.showBasicAuthForm) {
-                    // Show authentication method selection
-                    OutlinedButton(
-                        onClick = { },
-                        enabled = false,
-                        modifier = Modifier
-                            .fillMaxWidth(0.6f)
-                            .height(50.dp)
-                            .padding(bottom = 16.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Key,
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                        Text("OAuth")
-                    }
-
-                    OutlinedButton(
-                        onClick = { onAction(LoginScreenAction.BasicAuthButtonClicked) },
-                        modifier = Modifier
-                            .fillMaxWidth(0.6f)
-                            .height(50.dp)
-                    ) {
-                        Text("Basic Auth")
-                    }
-                } else {
-                    // Show basic auth login form
-                    OutlinedTextField(
-                        value = state.username,
-                        onValueChange = { onAction(LoginScreenAction.UsernameChanged(it)) },
-                        label = { Text("Username") },
-                        singleLine = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp)
-                    )
-
-                    OutlinedTextField(
-                        value = state.password,
-                        onValueChange = { onAction(LoginScreenAction.PasswordChanged(it)) },
-                        label = { Text("Password") },
-                        visualTransformation = PasswordVisualTransformation(),
-                        singleLine = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 24.dp)
-                    )
-
-                    Button(
-                        onClick = { onAction(LoginScreenAction.LoginButtonClicked(state.username, state.password)) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                    ) {
-                        Text("Login")
-                    }
-                }
+                Spacer(Modifier.height(24.dp))
             }
-        }
-    }
+        },
+        basicAuthScreenHeader = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterStart),
+            ) {
+                Spacer(Modifier.height(100.dp))
+                Image(
+                    painter = painterResource(Res.drawable.mifos_logo),
+                    contentDescription = "Mifos Logo",
+                    modifier = Modifier.size(200.dp, 100.dp)
+                        .align(Alignment.CenterHorizontally),
+                )
+                Spacer(Modifier.height(50.dp))
+                Text(
+                    text = "Enter your login details",
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.align(Alignment.Start),
+                )
+                Spacer(Modifier.height(16.dp))
+            }
+        },
+        footerContent = {
+            MifosPoweredCard(
+                textColor = AuthUiStyle().buttonBackgroundColor,
+                iconColor = AuthUiStyle().buttonBackgroundColor,
+            )
+        },
+    )
 }
 
 @Composable
@@ -179,7 +157,7 @@ fun LoginScreenDialog(state: LoginScreenState, onDismiss: () -> Unit) {
                     TextButton(onClick = onDismiss) {
                         Text("OK")
                     }
-                }
+                },
             )
         }
         LoginScreenState.ScreenState.Loading -> {
@@ -187,12 +165,12 @@ fun LoginScreenDialog(state: LoginScreenState, onDismiss: () -> Unit) {
                 Card {
                     Column(
                         modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         CircularProgressIndicator()
                         Text(
                             text = "Loading...",
-                            modifier = Modifier.padding(top = 8.dp)
+                            modifier = Modifier.padding(top = 8.dp),
                         )
                     }
                 }
@@ -202,7 +180,6 @@ fun LoginScreenDialog(state: LoginScreenState, onDismiss: () -> Unit) {
         null -> {}
     }
 }
-
 
 @Preview
 @Composable
